@@ -1,4 +1,4 @@
-# ideal
+# ifeel2
 
 ## Project setup
 ```
