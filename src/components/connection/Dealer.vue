@@ -54,6 +54,7 @@ export default {
     height: 30px;
 
     &-text {
+      cursor: default;
       font-family: Montserrat;
       font-size: 1.1rem;
       letter-spacing: 1px;
