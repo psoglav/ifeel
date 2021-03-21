@@ -1,5 +1,7 @@
 require('dotenv/config')
 
+const chat = require('../models/chat')
+
 var currentStage = 1
 
 const stage = () => {
