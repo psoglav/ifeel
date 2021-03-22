@@ -42,6 +42,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    lightColor: {
+      type: String,
+      default: '#bbbbff',
+    },
     // status: {
     // type: String,
     // default: 'out',
@@ -53,11 +57,15 @@ export default {
       out: 'is out',
       staring: 'is staring',
     },
-    status: 'typing',
+    status: 'out',
     handledStatus: '',
     waitingStatuses: ['typing'],
     waitingAnimation: null,
     idleAnimation: null,
+    staringAvatarAnimation: null,
+    onlineAnimation: null,
+    offlineAnimation: null,
+    mouseControlledLook: false,
   }),
   watch: {
     status: {
@@ -101,12 +109,7 @@ export default {
 
             self.waitingAnimation.restart()
 
-            if (val != 'staring') {
-              self.idleAnimation.restart()
-              self.idleAnimation.pause()
-            } else {
-              self.idleAnimation.restart()
-            }
+            self.handleStatus(val)
           },
         })
       },
@@ -124,6 +127,24 @@ export default {
     },
   },
   methods: {
+    distance(x1, x2, y1, y2) {
+      var a = x1 - x2
+      var b = y1 - y2
+
+      return Math.sqrt(a * a + b * b)
+    },
+    handleStatus(status) {
+      if (status != 'staring') {
+        this.idleAnimation.restart()
+        this.idleAnimation.pause()
+        this.stopAnimatingStaringAvatar()
+        if (!this.online) this.goOffline()
+      } else {
+        if (this.online) this.goOnline()
+        this.startAnimatingStaringAvatar()
+        this.idleAnimation.restart()
+      }
+    },
     defineAnimations() {
       let self = this
 
@@ -142,29 +163,106 @@ export default {
         loop: true,
       })
     },
+    startAnimatingStaringAvatar() {
+      if (this.mouseControlledLook) return
+
+      const self = this
+
+      if (!this.staringAvatarAnimation) {
+        this.staringAvatarAnimation = anime({
+          targets: self.$refs.pAvatar,
+          boxShadow() {
+            const [x, y] = [anime.random(-25, 25), anime.random(-5, 5)]
+            const [blur, spread] = [anime.random(50, 85), anime.random(5, 8)]
+
+            return `0 0 15px 3px ${self.lightColor}, ${x}px ${y}px ${blur}px ${spread}px ${self.lightColor}`
+          },
+          duration: anime.random(800, 1000),
+          complete() {
+            self.staringAvatarAnimation = null
+            self.startAnimatingStaringAvatar()
+          },
+        })
+      } else {
+        this.staringAvatarAnimation.play()
+      }
+    },
+    stopAnimatingStaringAvatar() {
+      if (this.staringAvatarAnimation) {
+        this.staringAvatarAnimation.pause()
+        this.goOnline()
+      }
+    },
+    setOnline() {
+      if (this.online) {
+        this.goOnline()
+      } else {
+        this.goOffline()
+      }
+    },
+    goOnline() {
+      this.$refs.pAvatar.style.transition = 'box-shadow .2s'
+      this.$refs.pAvatar.style.boxShadow = `0 0 7px 5px ${this.lightColor}`
+    },
+    goOffline() {
+      this.$refs.pAvatar.style.transition = 'box-shadow .4s'
+      this.$refs.pAvatar.style.boxShadow = `0 0 200px 10px ${this.lightColor}00`
+    },
+    mouseMoveHandler(e) {
+      this.mouseControlledLook = true
+
+      if (this.status != 'staring') {
+        this.setOnline()
+        return
+      }
+
+      this.$refs.pAvatar.style.transition = 'box-shadow 0.05s'
+
+      const avatarRect = this.$refs.pAvatar.getBoundingClientRect()
+      const aw = avatarRect.width
+      const ah = avatarRect.height
+      const ax = avatarRect.x + aw / 2
+      const ay = avatarRect.y + ah / 2
+      const mx = e.clientX - ax
+      const my = e.clientY - ay
+
+      const dist = this.distance(e.clientX, ax, e.clientY, ay)
+
+      this.$refs.pAvatar.style.boxShadow = `
+      ${mx / 30}px ${my / 30}px ${dist / 12 + 5}px 5px ${this.lightColor},
+        0 0 25px 3px ${this.lightColor}`
+    },
   },
   mounted() {
-    this.status = 'out'
-
     let self = this
 
-    setTimeout(function() {
-      self.status = 'staring'
+    if (this.me) {
+      this.status = 'staring'
+      document.addEventListener('mousemove', this.mouseMoveHandler)
+    } else {
       setTimeout(function() {
-        self.status = 'typing'
+        self.status = 'staring'
         setTimeout(function() {
-          self.status = 'staring'
+          self.status = 'typing'
           setTimeout(function() {
-            self.status = 'typing'
+            self.status = 'staring'
             setTimeout(function() {
-              self.status = 'out'
-            }, 5000)
-          }, 1000)
-        }, 5000)
-      }, 1000)
-    }, 3000)
+              self.status = 'typing'
+              setTimeout(function() {
+                self.status = 'out'
+              }, 5000)
+            }, 1000)
+          }, 5000)
+        }, 8000)
+      }, 3000)
+    }
 
     this.defineAnimations()
+  },
+  beforeDestroy() {
+    if (this.me) {
+      document.removeEventListener('mousemove', this.mouseMoveHandler)
+    }
   },
 }
 </script>
@@ -174,6 +272,7 @@ export default {
 
 .chat-participant {
   display: grid;
+  position: relative;
   width: 300px;
   margin: auto;
   grid-template-areas: 'name avatar status';
@@ -196,10 +295,10 @@ export default {
     height: 60px;
     border-radius: 100%;
     background-color: #fff;
-    transition: box-shadow 0.4s;
+    // transition: box-shadow 0.4s;
 
     &.online {
-      box-shadow: 0 0 15px 3px #bbbbff;
+      box-shadow: 0 0 0px 0px #bbbbff;
     }
   }
 
@@ -207,11 +306,9 @@ export default {
     grid-area: status;
     opacity: 1;
     width: 100%;
+    position: relative;
     text-align: left;
-
-    &.typing {
-      // text-shadow: #fff 0 0 5px, white 0 0 15px, white 0 0 20px;
-    }
+    z-index: 100;
 
     &_idle-suffix,
     &_waiting-suffix {
@@ -220,7 +317,7 @@ export default {
     }
 
     &.out {
-      color: #ccccff88;
+      color: #ccccff99;
     }
   }
 }
