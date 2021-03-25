@@ -1,15 +1,16 @@
 <template>
   <div class="chat">
     <div class="chat_participants">
-      <chat-participant :profile="profile2" status="typing" />
+      <chat-participant :profile="oppositeUser" status="typing" />
       <connection />
-      <chat-participant :profile="profile1" me status="typing" />
+      <chat-participant :profile="me" me status="typing" />
     </div>
     <div class="chat-container">
       <div class="chat-container_messages">
         <div
           v-for="(stack, i) in stacks"
           :key="i"
+          :class="{ opposite: me.id != stack[0].user }"
           class="chat-container_messages-stack"
         >
           <div
@@ -40,12 +41,12 @@ export default {
     return {
       connectionSegments: 10,
       stacks: [],
-      profile1: {
+      me: {
         id: 1,
         me: true,
         status: 'staring',
       },
-      profile2: {
+      oppositeUser: {
         id: 8932489,
         name: 'wwwolfie',
         status: 'staring',
@@ -76,7 +77,7 @@ export default {
               },
             ],
           },
-          user: 8932489,
+          user: 1,
           at: 2,
         },
         {
@@ -91,7 +92,7 @@ export default {
             ],
           },
           user: 8932489,
-          at: 3,
+          at: 60003,
         },
         {
           content: {
@@ -118,6 +119,7 @@ export default {
 
         let ts = 0
         let next = null
+        let prev = null
 
         this.stacks = []
 
@@ -125,9 +127,10 @@ export default {
           let l = this.stacks.length
           next = messages.shift()
 
-          if (!ts || ts + 60000 <= next?.at) {
+          if (!ts || ts + 60000 <= next.at || next.user != prev?.user) {
             ts = next.at
             this.stacks.push([next])
+            prev = next
           } else {
             this.stacks[l - 1].push(next)
           }
@@ -241,13 +244,17 @@ $stacks-gap: 30px;
 
         &.opposite &_item {
           align-self: flex-end;
-          border-radius: $msg-min-radius 0 0 $msg-min-radius;
+          border-radius: $msg-max-radius 0 $msg-max-radius $msg-max-radius;
 
-          &:last-child {
+          &.stacked {
+            border-radius: $msg-min-radius 0 0 $msg-min-radius;
+          }
+
+          &.stacked:last-child {
             border-radius: $msg-min-radius 0 $msg-max-radius $msg-max-radius;
           }
 
-          &:first-child {
+          &.stacked:first-child {
             border-radius: $msg-max-radius 0 0 $msg-min-radius;
           }
         }
