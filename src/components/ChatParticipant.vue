@@ -216,6 +216,7 @@ export default {
       const self = this
 
       setTimeout(() => {
+        self.$refs.hitLight.style.transition = ''
         this.$refs.hitLight.style.boxShadow = `0 0 20px 1px ${this.lightColor}`
         setTimeout(() => {
           self.$refs.hitLight.style.transition = 'box-shadow .8s'
@@ -309,13 +310,11 @@ export default {
     background-color: white;
     display: flex;
     justify-content: center;
-    transition: background-color 1s;
+    cursor: pointer;
 
-    &:hover {
-      &-pic {
-        transition-delay: 0s;
-        opacity: 1;
-      }
+    &:hover &-pic img {
+      transform: scale(1.4);
+      filter: blur(2px);
     }
 
     &-pic {
@@ -328,8 +327,10 @@ export default {
       height: calc(100% + 2px);
       display: flex;
       justify-content: center;
+      pointer-events: none;
 
       img {
+        transition: transform 0.4s, filter 0.4s;
         height: 100%;
         margin: 0 auto;
       }
