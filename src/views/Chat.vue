@@ -7,99 +7,18 @@
     </div>
     <div class="chat-container">
       <div class="chat-container_messages">
-        <div class="chat-container_messages-stack opposite">
-          <div class="chat-container_messages-stack_item">
-            я был на море
-          </div>
-          <div class="chat-container_messages-stack_item">
-            и море шептало мне своим сладким бризом
-          </div>
-          <div class="chat-container_messages-stack_item">
-            - возвращайся - возвращайся - возвращайся - возвращайся -
-            возвращайся - возвращайся - возвращайся - возвращайся - возвращайся
-            - возвращайся - возвращайся - возвращайся - возвращайся -
-            возвращайся - возвращайся - возвращайся - возвращайся - возвращайся
-            - возвращайся - возвращайся - возвращайся - возвращайся -
-            возвращайся - возвращайся - возвращайся - возвращайся - возвращайся
-            - возвращайся - возвращайся - возвращайся - возвращайся -
-            возвращайся - возвращайся - возвращайся - возвращайся - возвращайся
-            - возвращайся - возвращайся - возвращайся - возвращайся -
-            возвращайся - возвращайся - возвращайся - возвращайся - возвращайся
-            - возвращайся - возвращайся
-          </div>
-          <div class="chat-container_messages-stack_item">
-            - мне одиноко
-          </div>
-        </div>
-        <div class="chat-container_messages-stack">
-          <div class="chat-container_messages-stack_item">
-            я был на море
-          </div>
-          <div class="chat-container_messages-stack_item">
-            и море шептало мне своим сладким бризом
-          </div>
-          <div class="chat-container_messages-stack_item">
-            - возвращайся
-          </div>
-          <div class="chat-container_messages-stack_item">
-            - мне одиноко
-          </div>
-        </div>
-        <div class="chat-container_messages-stack">
-          <div class="chat-container_messages-stack_item">
-            я был на море
-          </div>
-          <div class="chat-container_messages-stack_item">
-            и море шептало мне своим сладким бризом
-          </div>
-          <div class="chat-container_messages-stack_item">
-            - возвращайся
-          </div>
-          <div class="chat-container_messages-stack_item">
-            - мне одиноко
-          </div>
-        </div>
-        <div class="chat-container_messages-stack">
-          <div class="chat-container_messages-stack_item">
-            я был на море
-          </div>
-          <div class="chat-container_messages-stack_item">
-            и море шептало мне своим сладким бризом
-          </div>
-          <div class="chat-container_messages-stack_item">
-            - возвращайся
-          </div>
-          <div class="chat-container_messages-stack_item">
-            - мне одиноко
-          </div>
-        </div>
-        <div class="chat-container_messages-stack opposite">
-          <div class="chat-container_messages-stack_item">
-            я был на море
-          </div>
-          <div class="chat-container_messages-stack_item">
-            и море шептало мне своим сладким бризом и море шептало мне своим
-            сладким бризом и море шептало мне своим сладким бризом и море
-            шептало мне своим сладким бризом и море шептало мне своим сладким
-            бризом и море шептало мне своим сладким бризом и море шептало мне
-            своим сладким бризом и море шептало мне своим сладким бризом и море
-            шептало мне своим сладким бризом и море шептало мне своим сладким
-            бризом и море шептало мне своим сладким бризом и море шептало мне
-            своим сладким бризом и море шептало мне своим сладким бризом и море
-            шептало мне своим сладким бризом и море шептало мне своим сладким
-            бризом и море шептало мне своим сладким бризом и море шептало мне
-            своим сладким бризом и море шептало мне своим сладким бризом и море
-            шептало мне своим сладким бризом и море шептало мне своим сладким
-            бризом и море шептало мне своим сладким бризом и море шептало мне
-            своим сладким бризом и море шептало мне своим сладким бризом и море
-            шептало мне своим сладким бризом и море шептало мне своим сладким
-            бризом
-          </div>
-          <div class="chat-container_messages-stack_item">
-            - возвращайся
-          </div>
-          <div class="chat-container_messages-stack_item">
-            - мне одиноко
+        <div
+          v-for="(stack, i) in stacks"
+          :key="i"
+          class="chat-container_messages-stack"
+        >
+          <div
+            v-for="(message, k) in stack"
+            :key="k"
+            class="chat-container_messages-stack_item"
+            :class="{ stacked: stack.length > 1 }"
+          >
+            {{ message.content.text }}
           </div>
         </div>
       </div>
@@ -120,13 +39,14 @@ export default {
   data() {
     return {
       connectionSegments: 10,
+      stacks: [],
       profile1: {
         id: 1,
         me: true,
         status: 'staring',
       },
       profile2: {
-        id: 1,
+        id: 8932489,
         name: 'wwwolfie',
         status: 'staring',
       },
@@ -143,7 +63,7 @@ export default {
             ],
           },
           user: 8932489,
-          at: +new Date(),
+          at: 1,
         },
         {
           content: {
@@ -157,7 +77,7 @@ export default {
             ],
           },
           user: 8932489,
-          at: +new Date(),
+          at: 2,
         },
         {
           content: {
@@ -171,7 +91,7 @@ export default {
             ],
           },
           user: 8932489,
-          at: +new Date(),
+          at: 3,
         },
         {
           content: {
@@ -184,29 +104,35 @@ export default {
               },
             ],
           },
-          user: 1,
-          at: +new Date(),
-        },
-        {
-          content: {
-            text: 'я был на море',
-            attachments: [
-              {
-                type: 'image',
-                url:
-                  'https://sun9-61.userapi.com/impg/AAUWN4BdMpMFYZ2P4IcPAGmKHD85z2PoPdwBWw/uk5z5GJFvQs.jpg?size=563x751&quality=96&sign=eb6853c14b4ee76fc5517e2de382513c&type=album',
-              },
-            ],
-          },
-          user: 1,
-          at: +new Date(),
+          user: 8932489,
+          at: 60004,
         },
       ],
     }
   },
-  computed: {
-    stacks() {
-      return [this.messages]
+  watch: {
+    messages: {
+      immediate: true,
+      handler(v) {
+        let messages = [...v].sort((a, b) => a.at - b.at)
+
+        let ts = 0
+        let next = null
+
+        this.stacks = []
+
+        while (messages.length) {
+          let l = this.stacks.length
+          next = messages.shift()
+
+          if (!ts || ts + 60000 <= next?.at) {
+            ts = next.at
+            this.stacks.push([next])
+          } else {
+            this.stacks[l - 1].push(next)
+          }
+        }
+      },
     },
   },
 }
@@ -297,13 +223,18 @@ $stacks-gap: 30px;
           font-size: $msg-font-size;
           font-family: Montserrat;
           align-self: flex-start;
-          border-radius: 0 $msg-min-radius $msg-min-radius 00;
+          border-radius: 0 $msg-max-radius $msg-max-radius $msg-max-radius;
+          border: 1px solid $subtle-light;
 
-          &:last-child {
+          &.stacked {
+            border-radius: 0 $msg-min-radius $msg-min-radius 0;
+          }
+
+          &.stacked:last-child {
             border-radius: 0 $msg-min-radius $msg-max-radius $msg-max-radius;
           }
 
-          &:first-child {
+          &.stacked:first-child {
             border-radius: 0 $msg-max-radius $msg-min-radius 0;
           }
         }
