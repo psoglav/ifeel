@@ -68,9 +68,6 @@ export default {
     this.$root.$off('hit-participant', this.hitParticipant)
     this.$root.$off('hit-me', this.hitMe)
   },
-  mounted() {
-    this.$root.$emit('hit-me')
-  },
 }
 </script>
 

@@ -313,7 +313,7 @@ export default {
       width: 100%;
       height: 100%;
       border-radius: 100%;
-      box-shadow: 0 0 100px 0 $light;
+      box-shadow: 0 0 100px 0 #{$light}00;
     }
 
     &.online {
