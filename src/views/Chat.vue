@@ -60,7 +60,7 @@ export default {
 
   &::after {
     top: auto;
-    bottom: 80px;
+    bottom: 0px;
     background: linear-gradient(180deg, transparent, black);
   }
 

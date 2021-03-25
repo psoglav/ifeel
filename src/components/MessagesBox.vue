@@ -196,7 +196,7 @@ $msg-hover-time: 0.4s;
   padding: 80px 0;
   z-index: 0;
   top: 0;
-  height: calc(100% - 80px);
+  height: 100%;
   width: 100%;
   overflow: auto;
   overflow-x: hidden;
