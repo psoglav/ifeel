@@ -4,6 +4,9 @@
       {{ profile.name }}
     </div>
     <div ref="pAvatar" :class="{ online }" class="chat-participant-avatar">
+      <div class="chat-participant-avatar-pic">
+        <img v-if="profile.pic" :src="profile.pic" :alt="profile.name" />
+      </div>
       <div ref="hitLight" class="chat-participant-avatar_hit-light"></div>
     </div>
     <div v-show="!profile.me" ref="pStatus" class="chat-participant-status">
@@ -301,10 +304,36 @@ export default {
     grid-area: avatar;
     width: 60px;
     height: 60px;
-    border-radius: 100%;
-    background-color: #fff;
     position: relative;
-    // transition: box-shadow 0.4s;
+    border-radius: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    transition: background-color 1s;
+
+    &:hover {
+      &-pic {
+        transition-delay: 0s;
+        opacity: 1;
+      }
+    }
+
+    &-pic {
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      border-radius: 100%;
+      overflow: hidden;
+      width: calc(100% + 2px);
+      height: calc(100% + 2px);
+      display: flex;
+      justify-content: center;
+
+      img {
+        height: 100%;
+        margin: 0 auto;
+      }
+    }
 
     &_hit-light {
       position: absolute;
@@ -328,6 +357,8 @@ export default {
     position: relative;
     text-align: left;
     z-index: 100;
+    pointer-events: none;
+    user-select: none;
 
     &_idle-suffix,
     &_waiting-suffix {
