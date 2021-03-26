@@ -37,10 +37,16 @@ export default {
           `0 0 88px 6px ${c}`,
           `0 0 100px 0px ${c}`,
         ],
-        duration: 150,
         direction: 'reverse',
-        autoplay: false,
+        duration: 150,
         delay: anime.stagger(10),
+        complete() {
+          anime({
+            targets: self.$refs.mLine.children,
+            boxShadow: `0 0 100px 0px ${c}`,
+            duration: 15,
+          })
+        },
       })
     },
     hitMe() {
@@ -55,7 +61,6 @@ export default {
           `0 0 100px 0px ${c}`,
         ],
         duration: 150,
-        autoplay: true,
         delay: anime.stagger(10),
       })
     },

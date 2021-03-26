@@ -58,6 +58,7 @@ export default {
     handleSubmit() {
       if (!this.input) return
       this.$emit('send-message', this.input)
+      this.$root.$emit('hit-participant')
       this.input = ''
     },
     enterNewLine() {

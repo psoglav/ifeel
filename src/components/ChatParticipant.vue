@@ -213,6 +213,8 @@ export default {
         0 0 25px 3px ${this.lightColor}`
     },
     hit() {
+      if (this.profile.status == 'out') return
+
       const self = this
 
       setTimeout(() => {
