@@ -2,7 +2,7 @@
   <div
     class="message-input common"
     :class="{ focused: inputFocused }"
-    @click="focusInput"
+    @click="focus"
   >
     <span :class="{ hidden: input }" class="message-input_placeholder"
       >Start typing...</span
@@ -10,13 +10,14 @@
     <div
       ref="input"
       class="message-input_editor common"
-      @input="handleInput"
+      @keypress="handleInputKeypress"
+      @input="updateInput"
       contenteditable="true"
       spellcheck="false"
       tabindex="0"
     ></div>
     <div
-      @click="handleSubmit"
+      @click="send"
       :class="{ hidden: submitHidden || !inputFocused }"
       class="message-input_submit"
     >
@@ -47,30 +48,54 @@ export default {
 
           t.submitHidden = t.initialInputHeight != t.inputHeight()
         }
-      }, 10)
+      })
     },
   },
   methods: {
-    focusInput() {
-      this.$refs.input.focus()
-    },
-    handleInput() {
-      this.input = this.$refs.input.innerText
-      console.log(this.input)
-    },
-    handleSubmit() {
-      if (!this.input) return
-      this.$emit('send-message', this.input)
+    send() {
+      const input = this.cleanedInput()
+
+      if (!input) return
+
+      this.$emit('send-message', input)
       this.$root.$emit('hit-participant')
-      this.$refs.input.innerText = ''
-      this.input = ''
+
+      this.clear()
     },
     enterNewLine() {
-      this.input += '\n'
+      document.execCommand('insertHTML', false, '<br>')
+      this.updateInput()
+    },
+    focus() {
+      this.$refs.input.focus()
+    },
+    clear() {
+      this.$refs.input.innerHTML = ''
+    },
+    cleanedInput() {
+      return this.$refs.input.innerHTML
+        .replace(/<br>/g, '\n')
+        .replace(/^[\n\s]+|[\n\s]+$/g, '')
     },
     inputHeight() {
       this.inputRect = this.$refs.input.getBoundingClientRect()
       return this.inputRect.height
+    },
+    handleInputKeypress(e) {
+      if (e.charCode == 13 || e.keyCode == 13 || e.which == 13) {
+        e.preventDefault()
+        this.send()
+        return
+      } else if (
+        (e.charCode == 10 || e.keyCode == 10 || e.which == 10) &&
+        e.ctrlKey
+      ) {
+        e.preventDefault()
+        this.enterNewLine()
+      }
+    },
+    updateInput() {
+      this.input = this.cleanedInput()
     },
     handleInputFocusEvent() {
       this.inputFocused = true
@@ -107,7 +132,7 @@ export default {
     this.initialInputHeight = this.inputHeight()
     this.prevInputHeight = this.inputHeight()
 
-    this.$refs.input.focus()
+    this.focus()
   },
 }
 </script>
@@ -171,13 +196,12 @@ export default {
     top: 0;
     left: 0;
     z-index: 10;
-    width: 100%;
+    width: calc(100% - 40px);
+    height: 100%;
     min-height: 38px;
     user-select: none;
 
     position: relative;
-    width: 100%;
-    height: 100%;
     border: none;
     word-break: break-all;
     color: white;
